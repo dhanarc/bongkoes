@@ -26,9 +26,9 @@ type Opts struct {
 
 func NewPlan(o *Opts) Plan {
 	confluenceAPI := confluence.NewConfluenceAPI(&confluence.Opts{
-		ConfluenceHost: o.Config.Anjir.ConfluenceHost,
-		Email:          o.Config.Anjir.AtlassianEmail,
-		Token:          o.Config.Anjir.AtlassianToken,
+		ConfluenceHost: o.Config.Bongkoes.ConfluenceHost,
+		Email:          o.Config.Bongkoes.AtlassianEmail,
+		Token:          o.Config.Bongkoes.AtlassianToken,
 	})
 	return &deploymentPlan{
 		cfg:           o.Config,

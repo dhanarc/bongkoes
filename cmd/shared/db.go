@@ -8,7 +8,7 @@ import (
 )
 
 func InitDatabase(c *config.Config) *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(c.Anjir.DBLocation), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(c.Bongkoes.DBLocation), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
