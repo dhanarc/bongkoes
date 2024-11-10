@@ -1,5 +1,0 @@
-atlassianoto:
-  db_location: "./db/db"
-  atlassian_email: ""
-  atlassian_token: ""
-  confluence_host: ""
