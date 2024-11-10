@@ -1,4 +1,4 @@
-atlassianoto:
+bongkoes:
   db_location: "./db/db"
   atlassian_email: "hakaosan@mekari.com"
   atlassian_token: "TOKEN"

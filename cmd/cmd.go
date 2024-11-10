@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/djk-lgtm/atlassianoto/cmd/deployment"
+	"github.com/djk-lgtm/bongkoes/cmd/deployment"
 	"os"
 
 	"github.com/spf13/cobra"

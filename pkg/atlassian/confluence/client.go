@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/djk-lgtm/atlassianoto/pkg/httpreq"
+	"github.com/djk-lgtm/bongkoes/pkg/httpreq"
 	"net/http"
 )
 

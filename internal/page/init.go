@@ -2,8 +2,8 @@ package page
 
 import (
 	"context"
-	"github.com/djk-lgtm/atlassianoto/config"
-	"github.com/djk-lgtm/atlassianoto/pkg/atlassian/confluence"
+	"github.com/djk-lgtm/bongkoes/config"
+	"github.com/djk-lgtm/bongkoes/pkg/atlassian/confluence"
 	"gorm.io/gorm"
 )
 
@@ -26,9 +26,9 @@ type Opts struct {
 
 func NewPlan(o *Opts) Plan {
 	confluenceAPI := confluence.NewConfluenceAPI(&confluence.Opts{
-		ConfluenceHost: o.Config.Atlassianoto.ConfluenceHost,
-		Email:          o.Config.Atlassianoto.AtlassianEmail,
-		Token:          o.Config.Atlassianoto.AtlassianToken,
+		ConfluenceHost: o.Config.Anjir.ConfluenceHost,
+		Email:          o.Config.Anjir.AtlassianEmail,
+		Token:          o.Config.Anjir.AtlassianToken,
 	})
 	return &deploymentPlan{
 		cfg:           o.Config,

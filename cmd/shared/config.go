@@ -1,7 +1,7 @@
 package shared
 
 import (
-	"github.com/djk-lgtm/atlassianoto/config"
+	"github.com/djk-lgtm/bongkoes/config"
 	"github.com/spf13/viper"
 	"log"
 	"strings"

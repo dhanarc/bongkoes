@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/djk-lgtm/atlassianoto/internal/page"
+	"github.com/djk-lgtm/bongkoes/internal/page"
 )
 
 var DAOs = []interface{}{

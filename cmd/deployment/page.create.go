@@ -3,8 +3,8 @@ package deployment
 import (
 	"context"
 	"fmt"
-	"github.com/djk-lgtm/atlassianoto/cmd/shared"
-	"github.com/djk-lgtm/atlassianoto/internal/page"
+	"github.com/djk-lgtm/bongkoes/cmd/shared"
+	"github.com/djk-lgtm/bongkoes/internal/page"
 	"github.com/spf13/cobra"
 	"strings"
 )

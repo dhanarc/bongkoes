@@ -2,7 +2,7 @@ package page
 
 import (
 	"context"
-	"github.com/djk-lgtm/atlassianoto/pkg/console"
+	"github.com/djk-lgtm/bongkoes/pkg/console"
 )
 
 func (d *deploymentPlan) GetConfig(ctx context.Context, serviceName string) error {
