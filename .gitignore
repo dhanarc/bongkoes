@@ -23,5 +23,13 @@ go.work.sum
 
 # env file
 .env
-atlassianoto
 /.idea
+
+# sqlite database
+./db/*
+
+# executable
+atlassianoto
+
+# configs
+config.yml

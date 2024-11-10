@@ -1,0 +1,5 @@
+atlassianoto:
+  db_location: "./db/db"
+  atlassian_email: "hakaosan@mekari.com"
+  atlassian_token: "TOKEN"
+  confluence_host: "https://your-project.atlassian.net"
