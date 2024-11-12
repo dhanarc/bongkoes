@@ -28,6 +28,9 @@ func runInit(_ *cobra.Command, _ []string) {
 	tribeName, err := readStdIn("Input Tribe Name: ")
 	goPanic(err, "failed to get tribe name")
 
+	projectKey, err := readStdIn("Input Project Key(Jira): ")
+	goPanic(err, "failed to get project key")
+
 	serviceCode, err := readStdIn("Input Service Code: ")
 	goPanic(err, "failed to get service code")
 
@@ -43,6 +46,7 @@ func runInit(_ *cobra.Command, _ []string) {
 	err = deploymentPlan.InitConfig(context.Background(), page.CreateServiceArgs{
 		TeamName:           *teamName,
 		TribeName:          *tribeName,
+		ProjectKey:         *projectKey,
 		ServiceCode:        *serviceCode,
 		ServiceName:        *serviceName,
 		TemplateID:         *templateID,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/djk-lgtm/bongkoes/config"
 	"github.com/djk-lgtm/bongkoes/pkg/atlassian/confluence"
+	"github.com/djk-lgtm/bongkoes/pkg/bitbucket"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +16,7 @@ type Plan interface {
 
 type deploymentPlan struct {
 	confluenceAPI confluence.API
+	bitbucketAPI  bitbucket.API
 	cfg           *config.Config
 	db            *gorm.DB
 }
@@ -30,9 +32,15 @@ func NewPlan(o *Opts) Plan {
 		Email:          o.Config.Bongkoes.AtlassianEmail,
 		Token:          o.Config.Bongkoes.AtlassianToken,
 	})
+	bitbucketAPI := bitbucket.NewBitbucketAPI(&bitbucket.Opts{
+		BitbucketWorkspace:   o.Config.Bongkoes.BitbucketWorkspace,
+		BitbucketUsername:    o.Config.Bongkoes.BitbucketUsername,
+		BitbucketAppPassword: o.Config.Bongkoes.BitbucketAppPassword,
+	})
 	return &deploymentPlan{
 		cfg:           o.Config,
 		db:            o.DBConn,
 		confluenceAPI: confluenceAPI,
+		bitbucketAPI:  bitbucketAPI,
 	}
 }

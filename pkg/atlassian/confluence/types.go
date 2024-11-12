@@ -1,5 +1,17 @@
 package confluence
 
+type VersionStatus string
+
+func (v VersionStatus) String() string {
+	return string(v)
+}
+
+const (
+	VersionReleased   VersionStatus = "released"
+	VersionUnReleased VersionStatus = "unreleased"
+	VersionArchived   VersionStatus = "archived"
+)
+
 type Link struct {
 	Base  string `json:"base"`
 	WebUI string `json:"webui"`
@@ -30,4 +42,56 @@ type BodyPage struct {
 type BodyStorage struct {
 	Representation string `json:"representation"`
 	Value          string `json:"value"`
+}
+
+type CreateVersionRequest struct {
+	Archived    bool   `json:"archived"`
+	Description string `json:"description"`
+	Name        string `json:"name"`
+	ProjectID   uint64 `json:"projectId"`
+	ReleaseDate string `json:"releaseDate"`
+	StartDate   string `json:"startDate"`
+	Released    bool   `json:"released"`
+}
+
+type CreateVersionResponse struct {
+	Archived        bool   `json:"archived"`
+	Description     string `json:"description"`
+	ID              string `json:"id"`
+	Name            string `json:"name"`
+	ProjectID       int64  `json:"projectId"`
+	ReleaseDate     string `json:"releaseDate"`
+	Released        bool   `json:"released"`
+	Self            string `json:"self"`
+	UserReleaseDate string `json:"userReleaseDate"`
+}
+
+type ProjectDetailResponse struct {
+	ID          string `json:"id"`
+	Key         string `json:"key"`
+	Description string `json:"description"`
+	Name        string `json:"name"`
+}
+
+type FetchLatestVersionRequest struct {
+	ProjectKey string
+	Query      string
+	Status     VersionStatus
+}
+
+type VersionResponse struct {
+	Values []Version `json:"values"`
+}
+
+type Version struct {
+	Self            string `json:"self"`
+	ID              string `json:"id"`
+	Name            string `json:"name"`
+	Archived        bool   `json:"archived"`
+	Released        bool   `json:"released"`
+	StartDate       string `json:"startDate"`
+	ReleaseDate     string `json:"releaseDate"`
+	UserStartDate   string `json:"userStartDate"`
+	UserReleaseDate string `json:"userReleaseDate"`
+	ProjectID       int64  `json:"projectId"`
 }

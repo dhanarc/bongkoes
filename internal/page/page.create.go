@@ -8,6 +8,7 @@ import (
 	"github.com/djk-lgtm/bongkoes/pkg/atlassian/confluence"
 	"github.com/samber/lo"
 	"html/template"
+	"strings"
 	"time"
 )
 
@@ -29,6 +30,12 @@ func (d *deploymentPlan) InitDocument(ctx context.Context, args CreateDeployment
 		return nil, err
 	}
 
+	// generate release
+	jiraLink, err := d.GenerateVersionRelease(ctx, service, currentTime, args.Tag)
+	if err != nil {
+		return nil, err
+	}
+
 	// render template
 	content, err := d.renderContent(RenderArgs{
 		Service:           service,
@@ -38,6 +45,7 @@ func (d *deploymentPlan) InitDocument(ctx context.Context, args CreateDeployment
 		DeploymentTime:    args.DeploymentTime,
 		EstimatedDownTime: args.DownTimeEst,
 		PageTemplate:      templatePage.Body.Storage.Value,
+		JiraLink:          *jiraLink,
 	})
 	if err != nil {
 		return nil, err
@@ -69,9 +77,15 @@ func (d *deploymentPlan) InitDocument(ctx context.Context, args CreateDeployment
 	return &links, nil
 }
 
+func (d *deploymentPlan) injectJiraLinkTemplate(template string) string {
+	injectAppearanceCard := strings.ReplaceAll(template, shared.TemplateJiraLink, fmt.Sprintf("%s %s", shared.TemplateJiraLink, shared.JiraLinkProps))
+	return strings.ReplaceAll(injectAppearanceCard, shared.TemplateJira, "{{ .JiraLink }}")
+}
+
 func (d *deploymentPlan) renderContent(args RenderArgs) (*string, error) {
 	// Parse the template file
-	t, err := template.New(args.Service.ServiceCode).Parse(args.PageTemplate)
+	contentTemplate := d.injectJiraLinkTemplate(args.PageTemplate)
+	t, err := template.New(args.Service.ServiceCode.String()).Parse(contentTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +93,7 @@ func (d *deploymentPlan) renderContent(args RenderArgs) (*string, error) {
 	// Execute the template with the data
 	stringWriter := bytes.NewBufferString("")
 	err = t.Execute(stringWriter, DeploymentArgs{
-		ServiceCode:    args.Service.ServiceCode,
+		ServiceCode:    args.Service.ServiceCode.String(),
 		ServiceName:    args.Service.ServiceName,
 		TeamName:       args.Service.TeamName,
 		TribeName:      args.Service.TribeName,
@@ -87,10 +101,45 @@ func (d *deploymentPlan) renderContent(args RenderArgs) (*string, error) {
 		DeploymentTime: fmt.Sprintf("%s %s", args.CurrentTime.Format(shared.DefaultConfluenceTitleTimeLayout), args.DeploymentTime),
 		DownTimeEst:    args.EstimatedDownTime,
 		RollbackTag:    args.RollbackTag,
-		JiraLink:       "TBD",
+		JiraLink:       args.JiraLink,
 	})
 	if err != nil {
 		return nil, err
 	}
 	return lo.ToPtr(stringWriter.String()), nil
+}
+
+func (d *deploymentPlan) GenerateVersionRelease(ctx context.Context, service Service, releaseTime time.Time, tags string) (*string, error) {
+	// get latest version
+	latestVersion, err := d.confluenceAPI.GetLatestVersion(ctx, &confluence.FetchLatestVersionRequest{
+		Query:      service.ServiceCode.TransformName(),
+		Status:     confluence.VersionReleased,
+		ProjectKey: service.ProjectKey,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	latestVersionReleased, err := time.Parse(shared.DefaultDateYYYYMMDD, latestVersion.ReleaseDate)
+	if err != nil {
+		return nil, err
+	}
+	newReleaseStart := latestVersionReleased.AddDate(0, 0, 1)
+
+	// create version
+	createdRelease, err := d.confluenceAPI.CreateVersion(ctx, &confluence.CreateVersionRequest{
+		Archived:    false,
+		Description: "", //TODO::TBD
+		Name:        fmt.Sprintf("%s - %s", service.ServiceCode.TransformName(), tags),
+		ProjectID:   service.ProjectID,
+		ReleaseDate: releaseTime.Format(shared.DefaultDateYYYYMMDD),
+		StartDate:   newReleaseStart.Format(shared.DefaultDateYYYYMMDD),
+		Released:    false,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	jiraLink := fmt.Sprintf("%s/projects/%s/versions/%s/tab/release-report-all-issues", d.cfg.Bongkoes.ConfluenceHost, service.ProjectKey, createdRelease.ID)
+	return lo.ToPtr(jiraLink), nil
 }

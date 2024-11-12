@@ -8,10 +8,13 @@ import (
 )
 
 const (
-	DBLocation     = "ENV_BONGKOES_DB_LOCATION"
-	AtlassianEmail = "ENV_BONGKOES_ATLASSIAN_EMAIL"
-	AtlassianToken = "ENV_BONGKOES_ATLASSIAN_TOKEN"
-	ConfluenceHost = "ENV_BONGKOES_CONFLUENCE_HOST"
+	DBLocation           = "ENV_BONGKOES_DB_LOCATION"
+	AtlassianEmail       = "ENV_BONGKOES_ATLASSIAN_EMAIL"
+	AtlassianToken       = "ENV_BONGKOES_ATLASSIAN_TOKEN"
+	ConfluenceHost       = "ENV_BONGKOES_CONFLUENCE_HOST"
+	BitbucketUsername    = "ENV_BONGKOES_BITBUCKET_USERNAME"
+	BitbucketAppPassword = "ENV_BONGKOES_BITBUCKET_APP_PASSWORD"
+	BitbucketWorkspace   = "ENV_BONGKOES_BITBUCKET_WORKSPACE"
 )
 
 func InitConfig() *config.Config {
@@ -26,10 +29,13 @@ func InitConfig() *config.Config {
 func readEnv() *config.Config {
 	return &config.Config{
 		Bongkoes: config.BongkoesConfig{
-			DBLocation:     os.Getenv(DBLocation),
-			AtlassianEmail: os.Getenv(AtlassianEmail),
-			AtlassianToken: os.Getenv(AtlassianToken),
-			ConfluenceHost: os.Getenv(ConfluenceHost),
+			DBLocation:           os.Getenv(DBLocation),
+			AtlassianEmail:       os.Getenv(AtlassianEmail),
+			AtlassianToken:       os.Getenv(AtlassianToken),
+			ConfluenceHost:       os.Getenv(ConfluenceHost),
+			BitbucketUsername:    os.Getenv(BitbucketUsername),
+			BitbucketAppPassword: os.Getenv(BitbucketAppPassword),
+			BitbucketWorkspace:   os.Getenv(BitbucketWorkspace),
 		},
 	}
 }

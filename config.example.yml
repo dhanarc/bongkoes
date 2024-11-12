@@ -3,3 +3,6 @@ bongkoes:
   atlassian_email: "hakaosan@mekari.com"
   atlassian_token: "TOKEN"
   confluence_host: "https://your-project.atlassian.net"
+  bitbucket_username: "user_name"
+  bitbucket_app_password: "your_password_here"
+  bitbucket_workspace: "your-project"
