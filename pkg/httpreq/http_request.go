@@ -37,6 +37,7 @@ func (c *HTTPClient) ExecuteBasicAuth(ctx context.Context, method string, path s
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(fmt.Sprintf("executing %s = auth = %s:%s", c.endpoint+path, c.username, c.password))
 	req.SetBasicAuth(c.username, c.password)
 	req = req.WithContext(ctx)
 
