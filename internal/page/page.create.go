@@ -121,6 +121,7 @@ func (d *deploymentPlan) renderContent(args RenderArgs) (*string, error) {
 func (d *deploymentPlan) CollectIssues(ctx context.Context, service Service, versionID, tag string) error {
 	issueList, err := d.fetchShippedIssue(ctx, service, tag)
 	if err != nil {
+		fmt.Println("error shipped")
 		return err
 	}
 	if len(issueList) == 0 {
@@ -134,6 +135,7 @@ func (d *deploymentPlan) bindIssueVersion(ctx context.Context, issues []string, 
 	for i := range issues {
 		err := d.confluenceAPI.AddIssueFixVersion(ctx, issues[i], jiraID)
 		if err != nil {
+			fmt.Println("error add issue")
 			return err
 		}
 	}

@@ -2,7 +2,6 @@ package deployment
 
 import (
 	"context"
-	"fmt"
 	"github.com/djk-lgtm/bongkoes/cmd/shared"
 	"github.com/djk-lgtm/bongkoes/internal/page"
 	"github.com/spf13/cobra"
@@ -21,8 +20,6 @@ func init() {
 
 func getGetConfig(_ *cobra.Command, _ []string) {
 	cfg := shared.InitConfig()
-
-	fmt.Println(cfg)
 
 	dbConnection := shared.InitDatabase(cfg)
 	deploymentPlan := page.NewPlan(&page.Opts{
