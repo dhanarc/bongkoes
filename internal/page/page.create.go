@@ -8,8 +8,6 @@ import (
 	"github.com/djk-lgtm/bongkoes/pkg/atlassian/confluence"
 	"github.com/samber/lo"
 	"html/template"
-	"os"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -19,7 +17,7 @@ func (d *deploymentPlan) InitDocument(ctx context.Context, args CreateDeployment
 	var service Service
 	err := d.db.Where("service_code = ?", args.ServiceCode).First(&service).Error
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("[InitDocument] failed to fetch service config, error=%+v", err)
 	}
 
 	// get current time
@@ -29,19 +27,19 @@ func (d *deploymentPlan) InitDocument(ctx context.Context, args CreateDeployment
 	// get template
 	templatePage, err := d.confluenceAPI.GetPageByID(ctx, service.TemplateID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("[InitDocument] failed to get template page, error=%+v", err)
 	}
 
 	// generate release
 	createdVersion, err := d.GenerateVersionRelease(ctx, service, currentTime, args.Tag)
 	if err != nil {
-		return nil, fmt.Errorf("failed generate version release, error=%v", err)
+		return nil, fmt.Errorf("[InitDocument] failed to generate version release, error=%+v", err)
 	}
 
 	// bind issues
 	err = d.CollectIssues(ctx, service, createdVersion.ID, args.Tag)
 	if err != nil {
-		return nil, fmt.Errorf("failed collecting issues, error=%v", err)
+		return nil, err
 	}
 
 	// render template
@@ -56,7 +54,7 @@ func (d *deploymentPlan) InitDocument(ctx context.Context, args CreateDeployment
 		JiraLink:          createdVersion.WebLink,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed rendering content, error=%v", err)
+		return nil, fmt.Errorf("[InitDocument] failed to rendering content page, error=%+v", err)
 	}
 
 	// create deployment page
@@ -78,7 +76,7 @@ func (d *deploymentPlan) InitDocument(ctx context.Context, args CreateDeployment
 
 	createdPaged, err := d.confluenceAPI.CreatePage(ctx, createPage)
 	if err != nil {
-		return nil, fmt.Errorf("failed creating deployment plan, error=%v", err)
+		return nil, fmt.Errorf("[InitDocument] failed to create confluence page, error=%+v", err)
 	}
 
 	// compose link page
@@ -116,93 +114,4 @@ func (d *deploymentPlan) renderContent(args RenderArgs) (*string, error) {
 		return nil, err
 	}
 	return lo.ToPtr(stringWriter.String()), nil
-}
-
-func (d *deploymentPlan) CollectIssues(ctx context.Context, service Service, versionID, tag string) error {
-	issueList, err := d.fetchShippedIssue(ctx, service, tag)
-	if err != nil {
-		fmt.Println("error shipped")
-		return err
-	}
-	if len(issueList) == 0 {
-		return nil
-	}
-
-	return d.bindIssueVersion(ctx, issueList, versionID)
-}
-
-func (d *deploymentPlan) bindIssueVersion(ctx context.Context, issues []string, jiraID string) error {
-	for i := range issues {
-		err := d.confluenceAPI.AddIssueFixVersion(ctx, issues[i], jiraID)
-		if err != nil {
-			fmt.Println("error add issue")
-			return err
-		}
-	}
-	return nil
-}
-
-func (d *deploymentPlan) fetchShippedIssue(ctx context.Context, service Service, newTag string) ([]string, error) {
-	tagsListResponse, err := d.bitbucketAPI.GetTagsByDateDesc(ctx, service.ServiceCode.String())
-	if err != nil {
-		return nil, err
-	}
-	latestTag := tagsListResponse.Values[0].Name
-
-	destinationPath := "./.shipped_issues"
-	d.git.CreateLocalTag(newTag)
-	err = d.git.GenerateCommitDiff(latestTag, newTag, destinationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	// load text
-	issuesBytes, err := os.ReadFile(destinationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	issuesRawList := string(issuesBytes)
-	issueRegex := fmt.Sprintf("%s-\\d+", service.ProjectKey)
-
-	cIssueRegex := regexp.MustCompile(issueRegex)
-	issueMatches := cIssueRegex.FindAllString(issuesRawList, -1)
-
-	return lo.Uniq(issueMatches), nil
-}
-
-func (d *deploymentPlan) GenerateVersionRelease(ctx context.Context, service Service, releaseTime time.Time, tags string) (*confluence.CreateVersionResponse, error) {
-	// get latest version
-	latestVersion, err := d.confluenceAPI.GetLatestVersion(ctx, &confluence.FetchLatestVersionRequest{
-		Query:      service.ServiceName,
-		Status:     confluence.VersionReleased,
-		ProjectKey: service.ProjectKey,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	latestVersionReleased, err := time.Parse(shared.DefaultDateYYYYMMDD, latestVersion.ReleaseDate)
-	if err != nil {
-		return nil, err
-	}
-	newReleaseStart := latestVersionReleased.AddDate(0, 0, 1)
-
-	// create version
-	createdRelease, err := d.confluenceAPI.CreateVersion(ctx, &confluence.CreateVersionRequest{
-		Archived:    false,
-		Description: "", //TODO::TBD
-		Name:        fmt.Sprintf("%s - %s", service.ServiceName, tags),
-		ProjectID:   service.ProjectID,
-		ReleaseDate: releaseTime.Format(shared.DefaultDateYYYYMMDD),
-		StartDate:   newReleaseStart.Format(shared.DefaultDateYYYYMMDD),
-		Released:    false,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	jiraLink := fmt.Sprintf("%s/projects/%s/versions/%s/tab/release-report-all-issues", d.cfg.Bongkoes.ConfluenceHost, service.ProjectKey, createdRelease.ID)
-	createdRelease.WebLink = jiraLink
-	return createdRelease, nil
 }

@@ -28,7 +28,5 @@ func getGetConfig(_ *cobra.Command, _ []string) {
 	})
 	ctx, _ := context.WithTimeout(context.Background(), time.Second)
 	err := deploymentPlan.GetConfig(ctx, service)
-	if err != nil {
-		panic("failed to get config")
-	}
+	goPanic(err, "[deployment:get-config] failed to get config")
 }

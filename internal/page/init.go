@@ -13,6 +13,7 @@ type Plan interface {
 	InitConfig(context.Context, CreateServiceArgs) error
 	GetConfig(context.Context, string) error
 	InitDocument(context.Context, CreateDeploymentArgs) (*string, error)
+	GetIssueListDiff(context.Context, string, string, string) error
 }
 
 type deploymentPlan struct {

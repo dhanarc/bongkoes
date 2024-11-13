@@ -1,3 +1,5 @@
 package deployment
 
-var service string
+var (
+	service, tag, latestTag string
+)
