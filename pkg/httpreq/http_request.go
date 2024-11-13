@@ -37,7 +37,6 @@ func (c *HTTPClient) ExecuteBasicAuth(ctx context.Context, method string, path s
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(fmt.Sprintf("executing %s = auth = %s:%s", c.endpoint+path, c.username, c.password))
 	req.SetBasicAuth(c.username, c.password)
 	req = req.WithContext(ctx)
 
@@ -56,11 +55,10 @@ func (c *HTTPClient) ExecuteBasicAuth(ctx context.Context, method string, path s
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(res.StatusCode)
 
 	if res.StatusCode >= 400 {
-		fmt.Println(fmt.Sprintf("error: %+v", string(resBody)))
-		return nil, errors.New("err client")
+		fmt.Println(fmt.Sprintf("[HTTP Client] response:%+v", string(resBody)))
+		return nil, errors.New("non success http call")
 	}
 
 	return resBody, nil

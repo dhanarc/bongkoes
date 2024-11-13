@@ -9,8 +9,8 @@ import (
 )
 
 var GetLatestIssuesCommand = &cobra.Command{
-	Use:   "deployment:latest-issues",
-	Short: "Get Latest Issues",
+	Use:   "deployment:issue-diff",
+	Short: "Get Issue Diff",
 	Run:   getIssueDiff,
 }
 
@@ -30,7 +30,5 @@ func getIssueDiff(_ *cobra.Command, _ []string) {
 	})
 	ctx, _ := context.WithTimeout(context.Background(), time.Second)
 	err := deploymentPlan.GetIssueListDiff(ctx, service, latestTag, tag)
-	if err != nil {
-		panic("failed to load issues")
-	}
+	goPanic(err, "[deployment:issue-diff] failed to get issue list diff")
 }

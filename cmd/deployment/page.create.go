@@ -55,7 +55,7 @@ func runCreate(_ *cobra.Command, _ []string) {
 		RollbackTag:    *rollbackTag,
 		Published:      publishFlag,
 	})
-	goPanic(err, "failed to create deployment plan")
+	goPanic(err, "[deployment:create] failed to execute init document")
 
-	fmt.Println(*link)
+	fmt.Println(fmt.Sprintf("[deployment:create] generated deployment document: %s", *link))
 }

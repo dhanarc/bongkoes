@@ -52,5 +52,5 @@ func runInit(_ *cobra.Command, _ []string) {
 		TemplateID:         *templateID,
 		DeploymentFolderID: *folderPageID,
 	})
-	goPanic(err, "failed to init deployment plan config")
+	goPanic(err, "[deployment:init] failed to execute init config")
 }
