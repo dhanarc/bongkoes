@@ -123,6 +123,10 @@ func (d *deploymentPlan) CollectIssues(ctx context.Context, service Service, ver
 		return err
 	}
 	latestTag := tagsListResponse.Values[0].Name
+	err = d.git.CreateLocalTag(tag)
+	if err != nil {
+		return err
+	}
 	issueList, err := d.getIssueDiff(ctx, service, latestTag, tag)
 	if err != nil {
 		fmt.Println("error shipped")

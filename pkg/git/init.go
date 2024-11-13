@@ -8,7 +8,7 @@ import (
 )
 
 type LocalGit interface {
-	CreateLocalTag(string)
+	CreateLocalTag(string) error
 	GenerateCommitDiff(string, string, string) error
 }
 
@@ -19,8 +19,8 @@ func NewGitLocal() LocalGit {
 	return &localGit{}
 }
 
-func (l *localGit) CreateLocalTag(tag string) {
-	cmd := exec.Command("git", "pull", "origin", "master")
+func (l *localGit) CreateLocalTag(tag string) error {
+	cmd := exec.Command("git", "checkout", "master")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -28,7 +28,18 @@ func (l *localGit) CreateLocalTag(tag string) {
 	err := cmd.Run()
 	if err != nil {
 		fmt.Println("Error:", err)
-		return
+		return err
+	}
+
+	cmd = exec.Command("git", "pull", "origin", "master")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Execute the command
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
 	}
 
 	cmd = exec.Command("git", "tag", tag)
@@ -39,8 +50,9 @@ func (l *localGit) CreateLocalTag(tag string) {
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println("Error:", err)
-		return
+		return err
 	}
+	return nil
 }
 
 func (l *localGit) GenerateCommitDiff(previousTag, currentTag, destinationPath string) error {

@@ -28,7 +28,6 @@ func (d *deploymentPlan) GetIssueListDiff(ctx context.Context, serviceCode, prev
 
 func (d *deploymentPlan) getIssueDiff(ctx context.Context, service Service, previousTag, newTag string) ([]string, error) {
 	destinationPath := fmt.Sprintf("./.%s", newTag)
-	d.git.CreateLocalTag(newTag)
 	err := d.git.GenerateCommitDiff(previousTag, newTag, destinationPath)
 	if err != nil {
 		return nil, err
