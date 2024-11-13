@@ -47,6 +47,7 @@ func (b *bitbucketAPI) GetTagsByDateDesc(ctx context.Context, repository string)
 	queryParams.Set("fields", fetchedFields)
 	queryParams.Set("sort", sortField)
 	path := fmt.Sprintf("/%s/repositories/%s/%s/refs/tags?%s", Version2, b.workspace, repository, queryParams.Encode())
+	fmt.Println(path)
 	response, err := b.httpClient.ExecuteBasicAuth(ctx, http.MethodGet, path, make(map[string]string), nil)
 	if err != nil {
 		return nil, err
