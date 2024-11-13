@@ -15,7 +15,7 @@ var GetLatestIssuesCommand = &cobra.Command{
 }
 
 func init() {
-	GetConfigCommand.Flags().StringVarP(&service, "service", "s", "", "service")
+	GetLatestIssuesCommand.Flags().StringVarP(&service, "service", "s", "", "service")
 	GetLatestIssuesCommand.Flags().StringVarP(&tag, "tag", "t", "", "tag")
 	GetLatestIssuesCommand.Flags().StringVarP(&latestTag, "previous-tag", "p", "", "previous tag")
 }
