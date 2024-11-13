@@ -30,6 +30,7 @@ type Opts struct {
 }
 
 func NewBitbucketAPI(o *Opts) API {
+	fmt.Println(o)
 	return &bitbucketAPI{
 		httpClient: httpreq.NewHTTPClient(&httpreq.Opts{
 			Endpoint: BaseURL,
