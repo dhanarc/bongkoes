@@ -14,6 +14,7 @@ const (
 
 	VersionAPI = "/rest/api/2/version"
 	ProjectAPI = "/rest/api/2/project"
+	IssueAPI   = "rest/api/2/issue"
 )
 
 type API interface {
@@ -24,6 +25,8 @@ type API interface {
 
 	CreateVersion(context.Context, *CreateVersionRequest) (*CreateVersionResponse, error)
 	GetLatestVersion(context.Context, *FetchLatestVersionRequest) (*Version, error)
+
+	AddIssueFixVersion(context.Context, string, string) error
 }
 
 type confluenceAPI struct {
@@ -139,4 +142,34 @@ func (c *confluenceAPI) GetLatestVersion(ctx context.Context, request *FetchLate
 	}
 
 	return &responseBody.Values[0], nil
+}
+
+func (c *confluenceAPI) AddIssueFixVersion(ctx context.Context, issueKey string, versionID string) error {
+	path := fmt.Sprintf("%s/%s", IssueAPI, issueKey)
+
+	updateOperation := new(FieldUpdateOperation)
+	updateOperation.Add = map[string]interface{}{
+		"id": versionID,
+	}
+
+	request := new(UpdateVersion)
+	request.Update = FixVersionArgs{
+		FixVersions: *updateOperation,
+	}
+	requestBytes, _ := json.Marshal(request)
+
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/json"
+	response, err := c.httpClient.ExecuteBasicAuth(ctx, http.MethodPut, path, headers, requestBytes)
+	if err != nil {
+		return err
+	}
+
+	responseBody := new(CreateVersionResponse)
+	err = json.Unmarshal(response, responseBody)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

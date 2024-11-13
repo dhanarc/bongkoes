@@ -64,6 +64,8 @@ type CreateVersionResponse struct {
 	Released        bool   `json:"released"`
 	Self            string `json:"self"`
 	UserReleaseDate string `json:"userReleaseDate"`
+
+	WebLink string `json:"-"`
 }
 
 type ProjectDetailResponse struct {
@@ -94,4 +96,20 @@ type Version struct {
 	UserStartDate   string `json:"userStartDate"`
 	UserReleaseDate string `json:"userReleaseDate"`
 	ProjectID       int64  `json:"projectId"`
+}
+
+type UpdateVersion struct {
+	Update FixVersionArgs `json:"update"`
+}
+
+type FixVersionArgs struct {
+	FixVersions FieldUpdateOperation `json:"fixVersions"`
+}
+
+type FieldUpdateOperation struct {
+	Add    map[string]interface{} `json:"add,omitempty"`
+	Copy   map[string]interface{} `json:"copy,omitempty"`
+	Edit   map[string]interface{} `json:"edit,omitempty"`
+	Remove map[string]interface{} `json:"remove,omitempty"`
+	Set    map[string]interface{} `json:"set,omitempty"`
 }

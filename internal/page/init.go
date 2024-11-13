@@ -5,6 +5,7 @@ import (
 	"github.com/djk-lgtm/bongkoes/config"
 	"github.com/djk-lgtm/bongkoes/pkg/atlassian/confluence"
 	"github.com/djk-lgtm/bongkoes/pkg/bitbucket"
+	"github.com/djk-lgtm/bongkoes/pkg/git"
 	"gorm.io/gorm"
 )
 
@@ -17,6 +18,7 @@ type Plan interface {
 type deploymentPlan struct {
 	confluenceAPI confluence.API
 	bitbucketAPI  bitbucket.API
+	git           git.LocalGit
 	cfg           *config.Config
 	db            *gorm.DB
 }
@@ -42,5 +44,6 @@ func NewPlan(o *Opts) Plan {
 		db:            o.DBConn,
 		confluenceAPI: confluenceAPI,
 		bitbucketAPI:  bitbucketAPI,
+		git:           git.NewGitLocal(),
 	}
 }
