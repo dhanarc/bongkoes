@@ -8,8 +8,6 @@ import (
 	"github.com/djk-lgtm/bongkoes/pkg/atlassian/confluence"
 	"github.com/samber/lo"
 	"html/template"
-	"os"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -119,7 +117,13 @@ func (d *deploymentPlan) renderContent(args RenderArgs) (*string, error) {
 }
 
 func (d *deploymentPlan) CollectIssues(ctx context.Context, service Service, versionID, tag string) error {
-	issueList, err := d.fetchShippedIssue(ctx, service, tag)
+	tagsListResponse, err := d.bitbucketAPI.GetTagsByDateDesc(ctx, service.ServiceCode.String())
+	if err != nil {
+		fmt.Println("GetTagsByDateDesc")
+		return err
+	}
+	latestTag := tagsListResponse.Values[0].Name
+	issueList, err := d.getIssueDiff(ctx, service, latestTag, tag)
 	if err != nil {
 		fmt.Println("error shipped")
 		return err
@@ -140,36 +144,6 @@ func (d *deploymentPlan) bindIssueVersion(ctx context.Context, issues []string, 
 		}
 	}
 	return nil
-}
-
-func (d *deploymentPlan) fetchShippedIssue(ctx context.Context, service Service, newTag string) ([]string, error) {
-	tagsListResponse, err := d.bitbucketAPI.GetTagsByDateDesc(ctx, service.ServiceCode.String())
-	if err != nil {
-		fmt.Println("GetTagsByDateDesc")
-		return nil, err
-	}
-	latestTag := tagsListResponse.Values[0].Name
-
-	destinationPath := "./.shipped_issues"
-	d.git.CreateLocalTag(newTag)
-	err = d.git.GenerateCommitDiff(latestTag, newTag, destinationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	// load text
-	issuesBytes, err := os.ReadFile(destinationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	issuesRawList := string(issuesBytes)
-	issueRegex := fmt.Sprintf("%s-\\d+", service.ProjectKey)
-
-	cIssueRegex := regexp.MustCompile(issueRegex)
-	issueMatches := cIssueRegex.FindAllString(issuesRawList, -1)
-
-	return lo.Uniq(issueMatches), nil
 }
 
 func (d *deploymentPlan) GenerateVersionRelease(ctx context.Context, service Service, releaseTime time.Time, tags string) (*confluence.CreateVersionResponse, error) {
