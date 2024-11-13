@@ -145,6 +145,7 @@ func (d *deploymentPlan) bindIssueVersion(ctx context.Context, issues []string, 
 func (d *deploymentPlan) fetchShippedIssue(ctx context.Context, service Service, newTag string) ([]string, error) {
 	tagsListResponse, err := d.bitbucketAPI.GetTagsByDateDesc(ctx, service.ServiceCode.String())
 	if err != nil {
+		fmt.Println("GetTagsByDateDesc")
 		return nil, err
 	}
 	latestTag := tagsListResponse.Values[0].Name

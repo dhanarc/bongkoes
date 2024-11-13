@@ -55,6 +55,7 @@ func (c *HTTPClient) ExecuteBasicAuth(ctx context.Context, method string, path s
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(res.StatusCode)
 
 	if res.StatusCode >= 400 {
 		fmt.Println(fmt.Sprintf("error: %+v", string(resBody)))
