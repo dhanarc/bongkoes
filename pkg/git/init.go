@@ -2,6 +2,7 @@ package git
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 )
@@ -43,12 +44,18 @@ func (l *localGit) CreateLocalTag(tag string) {
 }
 
 func (l *localGit) GenerateCommitDiff(previousTag, currentTag, destinationPath string) error {
-	cmd := exec.Command("git", "log", fmt.Sprintf("%s..%s", previousTag, currentTag), ">", destinationPath)
-	cmd.Stdout = os.Stdout
+	outFile, err := os.Create(destinationPath)
+	if err != nil {
+		log.Fatalf("Failed to create output file: %v", err)
+	}
+	defer outFile.Close()
+
+	cmd := exec.Command("git", "log", fmt.Sprintf("%s..%s", previousTag, currentTag))
+	cmd.Stdout = outFile
 	cmd.Stderr = os.Stderr
 
 	// Execute the command
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		fmt.Println("Error:", err)
 		return err
