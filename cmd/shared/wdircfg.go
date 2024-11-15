@@ -18,8 +18,8 @@ type PipelineAlias struct {
 }
 
 func GetProjectConfig() *ProjectConfig {
-	// Set the file name of the .env file
 	viper.SetConfigFile(".bongkoes")
+	viper.SetConfigType("dotenv")
 
 	// Read in the .env file
 	if err := viper.ReadInConfig(); err != nil {
@@ -30,22 +30,23 @@ func GetProjectConfig() *ProjectConfig {
 	repositoryName := viper.GetString("SERVICE_CODE")
 
 	// deployStagingAli:staging[master];deployProduction:production[master]
-	regexAlias := regexp.MustCompile(`(\w+):(\w+)\[(\w+)\\]`)
+	regexAlias := regexp.MustCompile(`(\w+):(\w+)\[(\w+)\]`)
 	pipelineAlias := viper.GetString("PIPELINE_ALIAS")
+
 	alias := strings.Split(pipelineAlias, ";")
 	pipelines := make(map[string]PipelineAlias)
 	if len(alias) > 0 {
 		for i := range alias {
 			match := regexAlias.FindStringSubmatch(alias[i])
-			if len(match) > 0 {
-				pipeline := match[0]
-				alias := match[1]
-				branch := match[2]
+			if len(match) > 1 {
+				pipeline := match[1]
+				pAlias := match[2]
+				branch := match[3]
 				p := PipelineAlias{
 					Branch:   branch,
 					Pipeline: pipeline,
 				}
-				pipelines[alias] = p
+				pipelines[pAlias] = p
 			}
 		}
 	}
