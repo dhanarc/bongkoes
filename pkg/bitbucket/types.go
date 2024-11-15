@@ -85,15 +85,21 @@ type TriggerPipelineTargetRequest struct {
 	Target TargetPipeline `json:"target"`
 }
 
-type TargetPipeline struct {
+type Selector struct {
 	Type    string `json:"type"`
-	RefType string `json:"ref_type"`
-	RefName string `json:"ref_name"`
+	Pattern string `json:"pattern"`
+}
+type TargetPipeline struct {
+	Selector Selector `json:"selector"`
+	Type     string   `json:"type"`
+	RefType  string   `json:"ref_type"`
+	RefName  string   `json:"ref_name"`
 }
 
 type RunPipelineResponse struct {
-	UUID  string `json:"uuid"`
-	Links struct {
+	UUID        string `json:"uuid"`
+	BuildNumber uint64 `json:"build_number"`
+	Links       struct {
 		Type string `json:"type"`
 	} `json:"links"`
 }

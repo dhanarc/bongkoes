@@ -42,15 +42,21 @@ func NewBitbucketAPI(o *Opts) API {
 	}
 }
 
-func (b *bitbucketAPI) RunPipelineBranch(ctx context.Context, repository, branch, pipelineType string) (*string, error) {
+func (b *bitbucketAPI) RunPipelineBranch(ctx context.Context, repository, branch, pipeline string) (*string, error) {
 	path := fmt.Sprintf("/%s/repositories/%s/%s/pipelines", Version2, b.workspace, repository)
 
-	triggerRequest := new(TriggerPipelineTargetRequest)
-	triggerRequest.Target = TargetPipeline{
-		Type:    pipelineType,
-		RefType: PipelineBranch.String(),
-		RefName: branch,
+	triggerRequest := &TriggerPipelineTargetRequest{
+		Target: TargetPipeline{
+			Type:    "pipeline_ref_target",
+			RefType: PipelineBranch.String(),
+			RefName: branch,
+			Selector: Selector{
+				Type:    "custom",
+				Pattern: pipeline,
+			},
+		},
 	}
+
 	requestBytes, _ := json.Marshal(triggerRequest)
 
 	headers := make(map[string]string)
@@ -66,7 +72,7 @@ func (b *bitbucketAPI) RunPipelineBranch(ctx context.Context, repository, branch
 		return nil, err
 	}
 
-	return lo.ToPtr(responseBody.Links.Type), nil
+	return lo.ToPtr(fmt.Sprintf("https://bitbucket.org/%s/%s/pipelines/results/%d", b.workspace, repository, responseBody.BuildNumber)), nil
 }
 
 func (b *bitbucketAPI) GetTagsByDateDesc(ctx context.Context, repository string) (*RefsTagsResponse, error) {
