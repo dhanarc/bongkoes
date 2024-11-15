@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/djk-lgtm/bongkoes/pkg/httpreq"
+	"github.com/samber/lo"
 	"net/http"
 	"net/url"
 )
@@ -16,6 +17,7 @@ const (
 
 type API interface {
 	GetTagsByDateDesc(context.Context, string) (*RefsTagsResponse, error)
+	RunPipelineBranch(context.Context, string, string, string) (*string, error)
 }
 
 type bitbucketAPI struct {
@@ -38,6 +40,33 @@ func NewBitbucketAPI(o *Opts) API {
 		}),
 		workspace: o.BitbucketWorkspace,
 	}
+}
+
+func (b *bitbucketAPI) RunPipelineBranch(ctx context.Context, repository, branch, pipelineType string) (*string, error) {
+	path := fmt.Sprintf("/%s/repositories/%s/%s/pipelines", Version2, b.workspace, repository)
+
+	triggerRequest := new(TriggerPipelineTargetRequest)
+	triggerRequest.Target = TargetPipeline{
+		Type:    pipelineType,
+		RefType: PipelineBranch.String(),
+		RefName: branch,
+	}
+	requestBytes, _ := json.Marshal(triggerRequest)
+
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/json"
+	response, err := b.httpClient.ExecuteBasicAuth(ctx, http.MethodPost, path, headers, requestBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	responseBody := new(RunPipelineResponse)
+	err = json.Unmarshal(response, responseBody)
+	if err != nil {
+		return nil, err
+	}
+
+	return lo.ToPtr(responseBody.Links.Type), nil
 }
 
 func (b *bitbucketAPI) GetTagsByDateDesc(ctx context.Context, repository string) (*RefsTagsResponse, error) {

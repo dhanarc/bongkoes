@@ -19,6 +19,7 @@ func init() {
 	rootCmd.AddCommand(deployment.GetConfigCommand)
 	rootCmd.AddCommand(deployment.CreateCommand)
 	rootCmd.AddCommand(deployment.GetLatestIssuesCommand)
+	rootCmd.AddCommand(deployment.PipelineRunCommand)
 }
 
 func Execute() {
