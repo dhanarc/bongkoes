@@ -1,5 +1,13 @@
 package bitbucket
 
+type PipelineRefType string
+
+func (p PipelineRefType) String() string {
+	return string(p)
+}
+
+const PipelineBranch PipelineRefType = "branch"
+
 type RefsTagsResponse struct {
 	Values []RefsTag `json:"values"`
 }
@@ -71,4 +79,21 @@ type ProjectDetailResponse struct {
 	Key         string `json:"key"`
 	Description string `json:"description"`
 	Name        string `json:"name"`
+}
+
+type TriggerPipelineTargetRequest struct {
+	Target TargetPipeline `json:"target"`
+}
+
+type TargetPipeline struct {
+	Type    string `json:"type"`
+	RefType string `json:"ref_type"`
+	RefName string `json:"ref_name"`
+}
+
+type RunPipelineResponse struct {
+	UUID  string `json:"uuid"`
+	Links struct {
+		Type string `json:"type"`
+	} `json:"links"`
 }
