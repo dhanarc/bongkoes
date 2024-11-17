@@ -8,26 +8,8 @@ import (
 	"regexp"
 )
 
-func (d *deploymentPlan) GetIssueListDiff(ctx context.Context, serviceCode, previousTag, tag string) error {
-	// get config
-	var service Service
-	err := d.db.Where("service_code = ?", serviceCode).First(&service).Error
-	if err != nil {
-		return err
-	}
-
-	issues, err := d.getIssueDiff(ctx, service, previousTag, tag)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(issues)
-
-	return nil
-}
-
-func (d *deploymentPlan) CollectIssues(ctx context.Context, service Service, versionID, tag string) error {
-	tagsListResponse, err := d.bitbucketAPI.GetTagsByDateDesc(ctx, service.ServiceCode.String())
+func (d *deploymentPlan) CollectIssues(ctx context.Context, versionID, tag string) error {
+	tagsListResponse, err := d.bitbucketAPI.GetTagsByDateDesc(ctx, d.projectCfg.ServiceCode)
 	if err != nil {
 		return fmt.Errorf("[CollectIssues] failed to execute GetTagsByDateDesc, error:%+v", err)
 	}
@@ -36,7 +18,7 @@ func (d *deploymentPlan) CollectIssues(ctx context.Context, service Service, ver
 	if err != nil {
 		return err
 	}
-	issueList, err := d.getIssueDiff(ctx, service, latestTag, tag)
+	issueList, err := d.getIssueDiff(latestTag, tag)
 	if err != nil {
 		return fmt.Errorf("[CollectIssues] failed to get issue diff, error:%+v", err)
 	}
@@ -47,7 +29,7 @@ func (d *deploymentPlan) CollectIssues(ctx context.Context, service Service, ver
 	return d.bindIssueVersion(ctx, issueList, versionID)
 }
 
-func (d *deploymentPlan) getIssueDiff(ctx context.Context, service Service, previousTag, newTag string) ([]string, error) {
+func (d *deploymentPlan) getIssueDiff(previousTag, newTag string) ([]string, error) {
 	destinationPath := fmt.Sprintf("./.%s", newTag)
 	err := d.git.GenerateCommitDiff(previousTag, newTag, destinationPath)
 	if err != nil {
@@ -67,7 +49,7 @@ func (d *deploymentPlan) getIssueDiff(ctx context.Context, service Service, prev
 	}()
 
 	issuesRawList := string(issuesBytes)
-	issueRegex := fmt.Sprintf("%s-\\d+", service.ProjectKey)
+	issueRegex := fmt.Sprintf("%s-\\d+", d.projectCfg.JiraProjectKey)
 
 	cIssueRegex := regexp.MustCompile(issueRegex)
 	issueMatches := cIssueRegex.FindAllString(issuesRawList, -1)

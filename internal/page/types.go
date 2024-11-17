@@ -58,6 +58,8 @@ type DeploymentArgs struct {
 	DownTimeEst    string
 	RollbackTag    string
 	JiraLink       string
+	Me             string
+	IssueTable     string
 }
 
 type RenderArgs struct {
@@ -67,4 +69,6 @@ type RenderArgs struct {
 	DeploymentTime, EstimatedDownTime string
 	PageTemplate                      string
 	JiraLink                          string
+	CurrentUser                       string
+	IssueQuery                        string
 }

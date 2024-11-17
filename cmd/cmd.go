@@ -15,11 +15,11 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(deployment.InitCommand)
 	rootCmd.AddCommand(deployment.GetConfigCommand)
 	rootCmd.AddCommand(deployment.CreateCommand)
 	rootCmd.AddCommand(deployment.GetLatestIssuesCommand)
 	rootCmd.AddCommand(deployment.PipelineRunCommand)
+	//rootCmd.AddCommand(deployment.DebugCommand)
 }
 
 func Execute() {

@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	DBLocation           = "ENV_BONGKOES_DB_LOCATION"
 	AtlassianEmail       = "ENV_BONGKOES_ATLASSIAN_EMAIL"
 	AtlassianToken       = "ENV_BONGKOES_ATLASSIAN_TOKEN"
 	ConfluenceHost       = "ENV_BONGKOES_CONFLUENCE_HOST"
@@ -29,7 +28,6 @@ func InitConfig() *config.Config {
 func readEnv() *config.Config {
 	return &config.Config{
 		Bongkoes: config.BongkoesConfig{
-			DBLocation:           os.Getenv(DBLocation),
 			AtlassianEmail:       os.Getenv(AtlassianEmail),
 			AtlassianToken:       os.Getenv(AtlassianToken),
 			ConfluenceHost:       os.Getenv(ConfluenceHost),

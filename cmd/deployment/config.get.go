@@ -1,16 +1,17 @@
 package deployment
 
 import (
-	"context"
-	"github.com/djk-lgtm/bongkoes/cmd/shared"
-	"github.com/djk-lgtm/bongkoes/internal/page"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"github.com/djk-lgtm/bongkoes/config"
 	"github.com/spf13/cobra"
-	"time"
+	"log"
 )
 
 var GetConfigCommand = &cobra.Command{
-	Use:   "deployment:get-config",
-	Short: "Get Deployment Config",
+	Use:   "deployment:meta",
+	Short: "Get Deployment Metadata",
 	Run:   getGetConfig,
 }
 
@@ -19,14 +20,15 @@ func init() {
 }
 
 func getGetConfig(_ *cobra.Command, _ []string) {
-	cfg := shared.InitConfig()
+	projectConfig := config.GetProjectConfig()
+	rawJSON, _ := json.Marshal(projectConfig)
 
-	dbConnection := shared.InitDatabase(cfg)
-	deploymentPlan := page.NewPlan(&page.Opts{
-		Config: cfg,
-		DBConn: dbConnection,
-	})
-	ctx, _ := context.WithTimeout(context.Background(), time.Second)
-	err := deploymentPlan.GetConfig(ctx, service)
-	goPanic(err, "[deployment:get-config] failed to get config")
+	// Beautify the parsed JSON
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, rawJSON, "", "  "); err != nil {
+		log.Fatalf("Error indenting JSON: %v", err)
+	}
+
+	// Print the beautified JSON
+	fmt.Println(prettyJSON.String())
 }

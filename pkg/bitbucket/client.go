@@ -18,17 +18,20 @@ const (
 type API interface {
 	GetTagsByDateDesc(context.Context, string) (*RefsTagsResponse, error)
 	RunPipelineBranch(context.Context, string, string, string) (*string, error)
+	GetLatestPullRequests(context.Context, string, PaginationRequest) (*PullRequestResponse, error)
 }
 
 type bitbucketAPI struct {
 	httpClient *httpreq.HTTPClient
 	workspace  string
+	mainBranch string
 }
 
 type Opts struct {
 	BitbucketWorkspace   string
 	BitbucketUsername    string
 	BitbucketAppPassword string
+	MainBranch           string
 }
 
 func NewBitbucketAPI(o *Opts) API {
@@ -38,7 +41,8 @@ func NewBitbucketAPI(o *Opts) API {
 			Username: o.BitbucketUsername,
 			Password: o.BitbucketAppPassword,
 		}),
-		workspace: o.BitbucketWorkspace,
+		workspace:  o.BitbucketWorkspace,
+		mainBranch: o.MainBranch,
 	}
 }
 

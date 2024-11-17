@@ -103,3 +103,29 @@ type RunPipelineResponse struct {
 		Type string `json:"type"`
 	} `json:"links"`
 }
+
+type PaginationRequest struct {
+	Page uint
+	Size uint
+}
+
+type PullRequestResponse struct {
+	Values  []PullRequest `json:"values"`
+	PageLen uint          `json:"pagelen"`
+	Size    uint64        `json:"size"`
+	Page    uint64        `json:"page"`
+}
+
+type PullRequest struct {
+	ID          int    `json:"id"`
+	Type        string `json:"type"`
+	Title       string `json:"title"`
+	Status      string `json:"status"`
+	MergeCommit struct {
+		Hash string `json:"hash"`
+		Type string `json:"type"`
+	} `json:"merge_commit"`
+	Reason    string `json:"reason"`
+	CreatedOn string `json:"created_on"`
+	UpdatedOn string `json:"updated_on"`
+}

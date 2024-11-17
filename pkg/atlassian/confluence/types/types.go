@@ -1,4 +1,4 @@
-package confluence
+package types
 
 type VersionStatus string
 
@@ -112,4 +112,12 @@ type FieldUpdateOperation struct {
 	Edit   map[string]interface{} `json:"edit,omitempty"`
 	Remove map[string]interface{} `json:"remove,omitempty"`
 	Set    map[string]interface{} `json:"set,omitempty"`
+}
+
+type User struct {
+	Type        string `json:"type"`
+	AccountID   string `json:"accountId"`
+	AccountType string `json:"accountType"`
+	Email       string `json:"email"`
+	PublicName  string `json:"publicName"`
 }

@@ -18,11 +18,8 @@ var CreateCommand = &cobra.Command{
 func runCreate(_ *cobra.Command, _ []string) {
 	cfg := shared.InitConfig()
 
-	dbConnection := shared.InitDatabase(cfg)
-
 	deploymentPlan := page.NewPlan(&page.Opts{
 		Config: cfg,
-		DBConn: dbConnection,
 	})
 	serviceCode, err := readStdIn("Input Service Code: ")
 	goPanic(err, "failed to get service code")
