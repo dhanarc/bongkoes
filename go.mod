@@ -3,6 +3,7 @@ module github.com/djk-lgtm/bongkoes
 go 1.22.3
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/jedib0t/go-pretty/v6 v6.6.1
 	github.com/samber/lo v1.47.0
 	github.com/spf13/cobra v1.8.1

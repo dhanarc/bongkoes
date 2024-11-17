@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/djk-lgtm/bongkoes/cmd/shared"
+	"github.com/djk-lgtm/bongkoes/config"
 	"github.com/djk-lgtm/bongkoes/internal/page"
 	"github.com/spf13/cobra"
 )
@@ -29,10 +30,10 @@ func runPipeline(_ *cobra.Command, _ []string) {
 
 	ctx := context.Background()
 
-	projectCfg := shared.GetProjectConfig()
-	alias := projectCfg.PipelineAlias[pipelineAlias]
+	projectCfg := config.GetProjectConfig()
+	alias := projectCfg.PipelineMap[pipelineAlias]
 	fmt.Println(fmt.Sprintf("[bongkoes] Running Pipeline %s - branch %s", alias.Pipeline, alias.Branch))
-	pipelineLink, err := deploymentPlan.RunPipelineBranch(ctx, projectCfg.RepositoryName, alias.Branch, alias.Pipeline)
+	pipelineLink, err := deploymentPlan.RunPipelineBranch(ctx, projectCfg.ServiceCode, alias.Branch, alias.Pipeline)
 	goPanic(err, "[deployment:pipeline] failed to running pipeline")
 
 	fmt.Println(fmt.Sprintf("[bongkoes] Pipeline Link:%s", *pipelineLink))

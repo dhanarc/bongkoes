@@ -10,11 +10,11 @@ import (
 )
 
 type Plan interface {
-	InitConfig(context.Context, CreateServiceArgs) error
 	GetConfig(context.Context, string) error
 	InitDocument(context.Context, CreateDeploymentArgs) (*string, error)
 	GetIssueListDiff(context.Context, string, string, string) error
 	RunPipelineBranch(ctx context.Context, serviceCode, branch, pipeline string) (*string, error)
+	Debug(context.Context) error
 }
 
 type deploymentPlan struct {
@@ -22,12 +22,13 @@ type deploymentPlan struct {
 	bitbucketAPI  bitbucket.API
 	git           git.LocalGit
 	cfg           *config.Config
+	projectCfg    *config.ProjectConfig
 	db            *gorm.DB
 }
 
 type Opts struct {
-	Config *config.Config
-	DBConn *gorm.DB
+	Config        *config.Config
+	ProjectConfig *config.ProjectConfig
 }
 
 func NewPlan(o *Opts) Plan {
@@ -40,10 +41,10 @@ func NewPlan(o *Opts) Plan {
 		BitbucketWorkspace:   o.Config.Bongkoes.BitbucketWorkspace,
 		BitbucketUsername:    o.Config.Bongkoes.BitbucketUsername,
 		BitbucketAppPassword: o.Config.Bongkoes.BitbucketAppPassword,
+		MainBranch:           o.ProjectConfig.MainBranch,
 	})
 	return &deploymentPlan{
 		cfg:           o.Config,
-		db:            o.DBConn,
 		confluenceAPI: confluenceAPI,
 		bitbucketAPI:  bitbucketAPI,
 		git:           git.NewGitLocal(),
